@@ -1,0 +1,25 @@
+{
+  "name": "weather-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jordiny/node-weather-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jordiny/node-weather-app/issues"
+  },
+  "homepage": "https://github.com/jordiny/node-weather-app#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "inquirer": "^8.1.1"
+  }
+}
