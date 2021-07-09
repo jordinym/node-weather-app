@@ -1,37 +1,45 @@
+require("colors");
+require("dotenv").config();
+
 const { readInput, pause, inquirerMenu, inquirerMenuCities, inquirerMenuHistorial } = require("./helpers/inquirer");
 const { saveDB } = require("./helpers/saveFile");
 const Searches = require("./models/searches");
-require("colors");
+
 
 const main=async()=>{
+
     const searches=new Searches();
     while (true) {
-        const opt=await inquirerMenu("hello");  
-
+        const opt=await inquirerMenu(); 
         switch (opt) {
             case 1:
                 const city= await readInput('Enter search city:');
                 const cities=await searches.city(city);
-                const citySelect=await inquirerMenuCities(cities);
-                if(citySelect){
-                    const createHistorial=await searches.createHistorial(citySelect);
+                const cityId=await inquirerMenuCities(cities);
+                
+                if(cityId){
+                    const citySelect=cities.find(c=>c.id===cityId);
+                    const createHistorial=await searches.createHistorial(citySelect.name);
+                    const temperature=await searches.temperature(citySelect.latitude,citySelect.longitude);
                     console.log('\nInformation of the city\n'.green);
-                    console.log('City: ',);
-                    console.log('Latitude: ',);
-                    console.log('Longitude: ',);
-                    console.log('Temperature: ',);
-                    console.log('Minimum: ',);
-                    console.log('Maximum: ',);
+                    console.log('City: ',citySelect.name);
+                    console.log('Latitude: ',citySelect.latitude);
+                    console.log('Longitude: ',citySelect.longitude);
+                    console.log('Temperature: ',temperature.temperature );
+                    console.log('Minimum: ', temperature.minimun);
+                    console.log('Maximum: ',temperature.maximum);
+                    console.log('what is the weather: ',temperature.weather_desc );
                 } 
                 break;
             case 2:
-                  await inquirerMenuHistorial(searches.listHistories);
+                 
+                if(searches.listHistories.length>0) await inquirerMenuHistorial(searches.listHistories);
                 break;
             default:
                 break;
         }
 
-        saveDB(searches.listHistories);
+        
         if(opt!==0) await pause(); else break;
     }  
 }

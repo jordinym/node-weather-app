@@ -1,47 +1,98 @@
 const { readDB } = require("../helpers/saveFile");
-const axios=require("axios");
+const axios = require("axios");
 
-class Searches{
-    
-    constructor(){
-        this.historial=['peru','lima','callao'];
-        // TODO: leer DB si si existe
-        const readData= readDB();
-        if(readData){
-            this.historial=[...readData];
-        }
+//console.log(process.env);
+class Searches {
+  constructor() {
+    this.historial = [];
+    // TODO: leer DB si si existe
+    const readData = readDB(); 
+    if (readData) { 
+      this.historial = [...readData]; 
     }
+  }
 
-    get paramsMatbox(){
-        return{
-            'access_token': 'pk.eyJ1Ijoiam9yZGlueW0iLCJhIjoiY2txdzJtaG1sMDg5cTJvbnZ1bGR2eTJubyJ9.zLa70P3BB_l147PCsFM8gg',
-            'limit':5,
-            'language':'es'
-        };
-    }
-    get listHistories(){
-        return this.historial;
-    }
-    createHistorial(city=''){
-        if(!this.historial.includes(city)){
-            this.historial.push(city);
-            if(this.historial.length>6){
-                delete this.historial[7];
-            }
-        }
-    }
+  get paramsMapbox() {
+    return {
+      access_token: process.env.MAPBOX_KEY,
+      limit: 5,
+      language: "es",
+    };
+  }
+  get paramsWeather() {
+      return {
+        'appid':process.env.OPEN_WEATHER_KEY, 
+        'units': 'metric',
+        'lang': 'es'
+     };
+  }
+  get listHistories() {
+    return this.historial.map(city=>{
+      let words=city.split(' ');
+      words=words.map(p=>p[0].toUpperCase()+p.substring(1)); 
+      return words.join(' ');
+    });
+  }
+  createHistorial(city = "") {
+    if (!this.historial.includes(city.toLocaleLowerCase())) {
+      this.historial.unshift(city.toLocaleLowerCase());
+      // if (this.historial.length > 6) {
+      //   delete this.historial[7];
+      // }
+      this.historial=this.historial.slice(0,5);
 
-    async city(lugar=''){
-        //peticion https://
-        const instance = axios.create({
-            baseURL: `https://api.mapbox.com/geocoding/v5/mapbox.places/${lugar}.json`,
-            params: this.paramsMatbox
-        });
-        const response = await instance.get();
-        console.log(response.data);
-
-        return[{id:1,description:"Lima"},{id:2,description:"Lima xd"},{id:3,description:"Lima xddd"}];
+      saveDB(this.historial);
     }
+  }
+
+  async city(lugar = "") {
+    try {
+      //peticion https://
+      const instance = axios.create({
+        baseURL: `https://api.mapbox.com/geocoding/v5/mapbox.places/${lugar}.json`,
+        params: this.paramsMapbox,
+      });
+      const response = await instance.get();
+      return response.data.features.map((city) => ({
+        id: city.id,
+        name: city.place_name,
+        longitude: city.center[0],
+        latitude: city.center[1],
+      }));
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async temperature(latitude = 0, longitude = 0) {
+    try {
+         //peticion https://
+         const instance = axios.create({
+             baseURL: `https://api.openweathermap.org/data/2.5/weather`,
+            //  params :{
+            //     'appid':process.env.OPEN_WEATHER_KEY,
+            //     'lat':latitude,
+            //     'lon':longitude,
+            //     'units': 'metric',
+            //     'lang': 'es'
+            //  }
+            params: {
+                    ...this.paramsWeather,
+                    'lat':latitude,
+                    'lon':longitude
+                }
+         });
+
+         const response= await instance.get();
+         const {weather,main}=response.data; 
+         return {
+                weather_desc: weather[0].description,
+                temperature: main.temp,
+                minimun: main.temp_min,
+                maximum: main.temp_max
+         };
+    } catch (error) {return {};}
+  }
 }
 
 module.exports = Searches;

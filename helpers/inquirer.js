@@ -56,9 +56,9 @@ const readInput = async (message) => {
 const inquirerMenuCities = async (data = []) => {
   
   //SEGUNDA FORMA
-  const choices = data.map((task, i) => {
+  const choices = data.map((item, i) => {
     const index = `${i+1}.`.green;
-    return { value:  task.description, name: `${index} ${task.description}` };
+    return { value:  item.id, name: `${index} ${item.name}` };
   });
 
   //AÑADIENDO UN VALOR EN LA POSICION CERO

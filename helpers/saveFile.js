@@ -1,8 +1,8 @@
 const fs = require("fs");
 
-const file = "./db/database.json";
+const file = "./db/database.json"; 
 const saveDB = (data) => {
-  fs.writeFileSync(file, JSON.stringify(data));
+  fs.writeFileSync(file, JSON.stringify({"historial":data}));
 };
 
 const readDB = () => {
@@ -11,7 +11,8 @@ const readDB = () => {
   }
   const data = fs.readFileSync(file,{encoding:'utf-8'});
 
-  return JSON.parse(data);
+  const response= JSON.parse(data); 
+  return response["historial"];
 };
 
 module.exports = { 
