@@ -5,16 +5,12 @@ const menuOptions = [
   {
     type: "list",
     name: "option",
-    message: "¿Que desea hace?",
+    message: "What would you like to do?",
     choices: [
-      { value: "1", name: `${"1.".green} Create task` },
-      { value: "2", name: `${"2.".green} List task` },
-      { value: "3", name: `${"3.".green} List completed task` },
-      { value: "4", name: `${"4.".green} List pending task` },
-      { value: "5", name: `${"5.".green} Complete task` },
-      { value: "6", name: `${"6.".green} Delete task` },
-      { value: "0", name: `${"0.".green} Exit \n` },
-    ],
+      { value: 1, name: `${"1.".green} Search city` },
+      { value: 2, name: `${"2.".green} Historial` }, 
+      { value: 0, name: `${"0.".green} Exit \n` },
+  ]
   },
 ];
 const inquirerMenu = async () => {
@@ -57,20 +53,12 @@ const readInput = async (message) => {
   return desc;
 };
 
-const inquirerMenuDelete = async (data = []) => {
-  /*
-  //PRIMERA FORMA
-  let choices = [];
+const inquirerMenuCities = async (data = []) => {
   
-  data.forEach((item, i) => {
-    let index = `${i}.`.green;
-    choices.push({ value: item.id, name: `${index} ${item.description}` });
-  }); */
-
   //SEGUNDA FORMA
   const choices = data.map((task, i) => {
-    const index = `${i}.`.green;
-    return { value: task.id, name: `${index} ${task.description}` };
+    const index = `${i+1}.`.green;
+    return { value:  task.description, name: `${index} ${task.description}` };
   });
 
   //AÑADIENDO UN VALOR EN LA POSICION CERO
@@ -80,7 +68,7 @@ const inquirerMenuDelete = async (data = []) => {
     {
       type: "list",
       name: "option",
-      message: "Borrar",
+      message: "Seleccione Lugar: ",
       choices,
     },
   ];
@@ -103,21 +91,19 @@ const confirmOpetionDelete = async () => {
   return option;
 };
 
-const inquirerMenuComplete = async (data = []) => {
-
-  const choices = data.map((task, i) => {
-    const index = `${i+1}.`.green;
-    return { 
-      value: task.id, 
-      name: `${index} ${task.description}` , 
-      checked: (task.completedEn) ? true : false };
-  }); 
+const inquirerMenuHistorial = async (data = []) => {
   
+  //SEGUNDA FORMA
+  const choices = data.map((item, i) => {
+    const index = `${i+1}.`.green;
+    return { value: item, name: `${index} ${item}` };
+  });
+ 
   const options = [
     {
-      type: "checkbox",
+      type: "list",
       name: "option",
-      message: "select one or more options",
+      message: "What would you like to do?",
       choices,
     },
   ];
@@ -130,7 +116,7 @@ module.exports = {
   inquirerMenu,
   pause,
   readInput,
-  inquirerMenuDelete,
+  inquirerMenuCities,
   confirmOpetionDelete,
-  inquirerMenuComplete
+  inquirerMenuHistorial
 };
